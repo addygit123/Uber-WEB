@@ -171,3 +171,61 @@ fetch('http://localhost:3000/users/login', {
   })
 })
 ```
+
+User Profile Endpoint
+Endpoint: GET /users/profile
+
+Description
+Fetches the profile information of the authenticated user.
+
+Authentication
+This endpoint requires a valid JWT token to be provided in the request headers.
+
+Response Codes
+200 OK: Successfully fetched user profile information.
+401 Unauthorized: Invalid or missing authentication token.
+
+Success Response
+{
+"user": {
+"fullname": {
+"firstname": "John",
+"lastname": "Doe"
+},
+"email": "john@example.com"
+}
+}
+
+Example Usage
+fetch('http://localhost:3000/users/profile', {
+method: 'GET',
+headers: {
+'Authorization': 'Bearer jwt_token_string'
+}
+})
+
+User Logout Endpoint
+Endpoint: GET /users/logout
+
+Description
+Logs out the authenticated user by invalidating the JWT token.
+
+Authentication
+This endpoint requires a valid JWT token to be provided in the request headers or cookies.
+
+Response Codes
+200 OK: Successfully logged out the user.
+401 Unauthorized: Invalid or missing authentication token.
+
+Success Response
+{
+"message": "Logged out successfully"
+}
+
+Example Usage
+fetch('http://localhost:3000/users/logout', {
+method: 'GET',
+headers: {
+'Authorization': 'Bearer jwt_token_string'
+}
+})

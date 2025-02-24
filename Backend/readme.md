@@ -1,110 +1,173 @@
-# User Registration Endpoint Documentation
+# API Documentation
 
-## Endpoint
+## User Registration Endpoint
 
-`POST /register`
+**Endpoint:** POST `/users/register`
 
-## Description
+### Description
 
-This endpoint allows a new user to register by providing their full name, email, and password. Upon successful registration, a JSON Web Token (JWT) is returned along with the user details.
+Creates a new user account with the provided information. Returns an authentication token upon successful registration.
 
-## Request Body
-
-The request body must be a JSON object containing the following fields:
-
-- `fullname`: An object containing the user's first name and last name.
-  - `firstname` (string, required): The user's first name. Must be at least 3 characters long.
-  - `lastname` (string, optional): The user's last name. Must be at least 3 characters long.
-- `email` (string, required): The user's email address. Must be a valid email format and at least 5 characters long.
-- `password` (string, required): The user's password. Must be at least 6 characters long.
-
-Example:
+### Request Body
 
 ```json
 {
   "fullname": {
-    "firstname": "John",
-    "lastname": "Doe"
+    "firstname": "string",
+    "lastname": "string" // optional
   },
-  "email": "john.doe@example.com",
-  "password": "password123"
+  "email": "string",
+  "password": "string"
 }
-```
 
-## Responses
+Data Requirements and Validation
+The /users/register endpoint expects a JSON payload with the following structure:
 
-### Success
+fullname: An object containing the user's first and last names.
+firstname: A string representing the user's first name. It is required and must be at least 3 characters long.
+lastname: An optional string representing the user's last name.
+email: A string representing the user's email address. It is required and must be a valid email format.
+password: A string representing the user's password. It is required and must be at least 6 characters long.
+The server performs the following validations:
 
-- **Status Code**: `201 Created`
-- **Body**:
-  ```json
-  {
-    "token": "JWT_TOKEN_HERE",
-    "user": {
-      "_id": "USER_ID_HERE",
-      "fullname": {
-        "firstname": "John",
-        "lastname": "Doe"
-      },
-      "email": "john.doe@example.com"
-    }
-  }
-  ```
+Presence of Required Fields: Checks if fullname, email, and password are present in the request body. Also checks if firstname is present inside fullname.
+Fullname Format: Checks if fullname is an object.
+Email Format: Validates that the provided email is in a valid email format.
+First Name Length: Validates that the first name is at least 3 characters long.
+Password Length: Validates that the password is at least 6 characters long.
+Email Uniqueness: Checks if the email already exists in the database.
+If any of these validations fail, the server returns a 400 status code with an error message.
 
-### Error
+Response Codes
+201 Created: User successfully created. Returns a JWT token and user information.
+400 Bad Request: Validation error or invalid input. The response body will contain an array of error messages, indicating which fields failed validation.
+409 Conflict: Email already exists. The response body will contain an error message indicating that the email is already in use.
+Success Response
+Error Response
+Example Usage
+User Login Endpoint
+Endpoint: POST /users/login
 
-- **Status Code**: `400 Bad Request`
-- **Body** (example):
+Description
+Authenticates a user with the provided email and password. Returns an authentication token upon successful login.
 
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "Invalid Email",
-        "param": "email",
-        "location": "body"
-      },
-      {
-        "msg": "First name should be at least 3 characters long",
-        "param": "fullname.firstname",
-        "location": "body"
-      },
-      {
-        "msg": "Password must be at least 6 characters long",
-        "param": "password",
-        "location": "body"
-      }
-    ]
-  }
-  ```
+Request Body
+Data Requirements and Validation
+The /users/login endpoint expects a JSON payload with the following structure:
 
-- **Status Code**: `409 Conflict`
-- **Body** (example):
-  ```json
-  {
-    "error": "Email already exists. Please use a different email."
-  }
-  ```
+email: A string representing the user's email address. It is required and must be a valid email format.
+password: A string representing the user's password. It is required and must be at least 6 characters long.
+The server performs the following validations:
 
-## Validation
+Presence of Required Fields: Checks if email and password are present in the request body.
+Email Format: Validates that the provided email is in a valid email format.
+Password Length: Validates that the password is at least 6 characters long.
+If any of these validations fail, the server returns a 400 status code with an error message.
 
-The following validations are performed on the request body:
+Response Codes
+200 OK: User successfully authenticated. Returns a JWT token and user information.
+400 Bad Request: Validation error or invalid input. The response body will contain an array of error messages, indicating which fields failed validation.
+401 Unauthorized: Invalid email or password. The response body will contain an error message indicating that the email or password is incorrect.
 
-- `email` must be a valid email format.
-- `fullname.firstname` must be at least 3 characters long.
-- `password` must be at least 6 characters long.
-
-## Example Request
-
-```bash
-curl -X POST http://localhost:3000/register \
--H "Content-Type: application/json" \
--d '{
+Success Response
+{
+  "token": "jwt_token_string",
+  "user": {
     "fullname": {
-        "firstname": "John",
-        "lastname": "Doe"
+      "firstname": "John",
+      "lastname": "Doe"
     },
-    "email": "john.doe@example.com",
-    "password": "password123"
-}'
+    "email": "john@example.com"
+  }
+}
+
+Error Response
+{
+  "errors": [
+    {
+      "msg": "Error message here",
+      "param": "field_name"
+    }
+  ]
+}
+
+Example Usage
+fetch('http://localhost:3000/users/register', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    fullname: {
+      firstname: "John",
+      lastname: "Doe"
+    },
+    email: "john@example.com",
+    password: "password123"
+  })
+})
+
+
+User Login Endpoint
+Endpoint: POST /users/login
+
+Description
+Authenticates a user with the provided email and password. Returns an authentication token upon successful login.
+
+Request Body
+{
+  "email": "string",
+  "password": "string"
+}
+
+Data Requirements and Validation
+The /users/login endpoint expects a JSON payload with the following structure:
+
+email: A string representing the user's email address. It is required and must be a valid email format.
+password: A string representing the user's password. It is required and must be at least 6 characters long.
+The server performs the following validations:
+
+Presence of Required Fields: Checks if email and password are present in the request body.
+Email Format: Validates that the provided email is in a valid email format.
+Password Length: Validates that the password is at least 6 characters long.
+If any of these validations fail, the server returns a 400 status code with an error message.
+
+Response Codes
+200 OK: User successfully authenticated. Returns a JWT token and user information.
+400 Bad Request: Validation error or invalid input. The response body will contain an array of error messages, indicating which fields failed validation.
+401 Unauthorized: Invalid email or password. The response body will contain an error message indicating that the email or password is incorrect.
+
+Success Response
+{
+  "token": "jwt_token_string",
+  "user": {
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john@example.com"
+  }
+}
+
+Error Response
+{
+  "errors": [
+    {
+      "msg": "Error message here",
+      "param": "field_name"
+    }
+  ]
+}
+
+Example Usage
+fetch('http://localhost:3000/users/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: "john@example.com",
+    password: "password123"
+  })
+})
 ```

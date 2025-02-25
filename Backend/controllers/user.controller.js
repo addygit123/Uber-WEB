@@ -9,6 +9,12 @@ module.exports.registerUser = async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const { fullname, email, password } = req.body;
+
+  const isUserAlreadyRegistered = await userModel.findOne({ email });
+
+  if (isUserAlreadyRegistered) {
+    return res.status(400).send("User already registered");
+  }
   if (!fullname || typeof fullname !== "object") {
     console.log("fullname is missing or incorrect:", fullname); // Debugging
     return res.status(400).json({ error: "Invalid fullname format" });

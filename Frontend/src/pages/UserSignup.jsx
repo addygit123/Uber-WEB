@@ -1,25 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useContext } from "react";
 import uberlogo from "../assets/uberlogo.png";
+import { UserDataContext } from "../context/UserContext";
+import axios from "axios";
+
 const UserSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userData, setUserData] = useState({});
-  const submitHandler = (e) => {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useContext(UserDataContext);
+
+  const submitHandler = async (e) => {
     e.preventDefault();
     const NewUserData = {
+      fullname: {
+        firstname: firstName,
+        lastname: lastName,
+      },
       email: email,
       password: password,
-      fullName: {
-        firstName: firstName,
-        lastName: lastName,
-      },
     };
-    setUserData(NewUserData);
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
+    if (firstName.length < 3) {
+      alert("First name should be at least 3 characters long");
+      return;
+    }
 
+    // setUserData(NewUserData);
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/users/register`,
+      NewUserData
+    );
+
+    if (response.status === 201) {
+      const data = response.data;
+      setUser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
     // console.log(userData);
     setEmail("");
     setPassword("");
